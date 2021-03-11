@@ -17,9 +17,30 @@ From the resulting `pprof` shell, try the following subcommands:
 You may grab periodic samples to compare later by running:
 ```bash
 #!/bin/bash
-for i in 1 2 3 4 5 6 7 8 9 10
+
+k8spod=$1
+
+i=3
+until [ $i -gt 50 ]
 do
-  curl  http://localhost:8080/debug/pprof/heap > heap.$i.pprof
-  sleep 10
+  ((i=i+1))
+  curl  http://localhost:8081/debug/pprof/heap > heap.pprof.$i
+  if [ $? -ne 0 -a -n "$k8spod" ]; then
+    kubectl port-forward $k8spod 8081:80 &
+    sleep 5
+    curl  http://localhost:8081/debug/pprof/heap > heap.pprof.$i
+  fi
+  sleep 60
 done
+```
+
+Then get top10 of all the samples:
+```bash
+#!/bin/bash
+
+for f in `ls -tr heap*`; do
+	ls -l $f
+	go tool pprof -top $f|head -16
+	echo
+done > top10.out
 ```
