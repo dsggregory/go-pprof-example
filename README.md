@@ -5,7 +5,7 @@ Go pprof is made available from an internal API server. You may interrogate perf
 
 In order to use the Go pprof tools, you must first create a k8s port forward on the API port:
 ```bash
-kubectl port-forward lrxd-lrxd-worker-0 8080:8080
+kubectl port-forward $k8spod_name 8080:8080
 ```
 You may then browse to `http://localhost:8080/debug/pprof/` to see what services are available. An example of using this to interrogate memory of the running process would be to then run the following which provides an interactive shell to generate memory reports, etc.
 ```bash
